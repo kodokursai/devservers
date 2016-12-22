@@ -1,0 +1,62 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# Visa Vagrant konfigūracija atliekama žemiau. "2" Vagrant.configure skiltyje
+# reiškia konfigūracijos versiją (yra palaikomos ir senesnės versijos.
+# Nekeiskite šio numerio nebent žinote ką darote.
+Vagrant.configure(2) do |config|
+  # Vagrant konfigūracijos dokumentacija gali būti peržiūrėta nuėjus šia nuoroda
+  # https://docs.vagrantup.com.
+
+  # Kiekviena Vagrant konfigūracija reikalauja dėžutės (Vagrant box). Daugiau 
+  # Vagrant dėžių yra čia https://atlas.hashicorp.com/search.
+  config.vm.box = "ubuntu/trusty64"
+
+  # Išjungti automatinį dėžės naujinimą. Išjungus
+  # dėžė bus atnaujinama tik tuo atveju, jei programuotojas paleis komandą
+  # `vagrant box outdated`. Tai nėra rekomenduotina.
+  # config.vm.box_check_update = false
+
+  # Sukuriamas specifinis porto nukreipimas iš jūsų kompiuterio į portą į
+  # virtualioje mašinoje esantį portą. Pavyzdyje žemiau,
+  # atidarymas "localhost:8080" pasieks 80 portą virtualios mašinos viduje.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  config.vm.network :forwarded_port, guest: 33066, host: 3306
+  
+  # Sukurti privatų tinklą, kuris leidžia tik tėvinei aplinkai (hostui) 
+  # pasiekti virtualią (guest) naudojant specifinį IP adresą.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  config.vm.network "private_network", ip: "192.168.66.99"
+  
+  # Sukurti viešaiprieinamą tinklą, kuris sutampa su jūsų sukurtu privačiu tinklu.
+  # Tai leidžia, kad jūsų virtuali mašina atsirastų kaip fizinis tinklas.
+  # config.vm.network "public_network"
+
+  # Duoti prieigą prie jūsų kompiuteryje esančio aplanko virtualiai mašinai.
+  # Pirmasis argumentas yra kelias iki lokalaus aplanko, o antrasis parametras
+  # yra kelias, kuris bus virtualioje mašinoje.
+   config.vm.synced_folder "webroot", "/vagrant/webroot"
+
+  # Tiekėjo speciniai nustaymai, kurie leidžia kontroliuoti įvairius
+  # tiekėjo nustatymus susijusius su Vagrant. Pavyzdyje naudojami nustatymai skirti
+  # VirtualBox.
+   config.vm.provider "virtualbox" do |vb|
+    # Rodyti VirtualBox GUI kai startuojama virtuali mašina
+    # vb.gui = true
+    
+	# Koks skiriamas atminties (RAM) kiekis virtualiai mašinai.
+    vb.memory = "2048"
+   end
+  
+  # Įgalinti diegimą ir naujinimą naudojant SHELL komandas. Papildomai kiti 
+  # diegimo įrankiai kaip Puppet, Chef, Ansible, Salt ir Docker taip pat galimi. 
+  # Dėl papildomų irankių žiūrėkite konkretaus dokumentaciją. Toliau pavyzdys.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
+
+  config.vm.provision "shell", path: "provision/setup.sh", privileged: true
+
+end
